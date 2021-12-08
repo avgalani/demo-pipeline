@@ -1,0 +1,30 @@
+name: coolDemo
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  deploy:
+    name: List S3 buckets
+    runs-on: ubuntu-latest
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: arn:aws:iam::459483145222:role/github-role
+        aws-region: eu-west-1
+
+    - name: just get caller identity
+      run: |
+        aws sts get-caller-identity
+        aws s3api list-buckets
